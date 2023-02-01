@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "farming/contracts/**",
+    "farming/mocks/*",
+]
+
+exclude = [
+    "farming/logics",
+]
+

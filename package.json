@@ -1,0 +1,35 @@
+{
+  "name": "farming",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@supercolony/typechain-compiler": "^0.5.1-beta.1",
+    "@supercolony/typechain-polkadot": "^0.5.0",
+    "@supercolony/typechain-types": "^0.0.16",
+    "@types/jest": "^29.2.3",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
+    "eslint": "^7.26.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "jest": "^29.3.1",
+    "patch-package": "^6.4.7",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.8.0"
+  },
+  "scripts": {
+    "compile": "typechain-compiler",
+    "compile:release": "typechain-compiler --release",
+    "test:single": "jest",
+    "test": "jest --testPathPattern \".spec.ts$\" --runInBand",
+    "postinstall": "patch-package"
+  },
+  "resolutions": {
+    "@polkadot/api": "9.10.2",
+    "@polkadot/api-contract": "9.10.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
