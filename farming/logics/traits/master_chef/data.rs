@@ -1,9 +1,8 @@
+#[cfg(feature = "std")]
+use ink::storage::traits::StorageLayout;
 use ink::{
     prelude::vec::Vec,
-    storage::{
-        traits::*,
-        Mapping,
-    },
+    storage::Mapping,
 };
 use openbrush::traits::{
     AccountId,
