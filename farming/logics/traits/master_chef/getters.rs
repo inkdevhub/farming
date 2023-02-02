@@ -5,8 +5,10 @@ use crate::traits::master_chef::{
     },
     farming::Data,
 };
-use ink_env::AccountId;
-use openbrush::traits::Storage;
+use openbrush::traits::{
+    AccountId,
+    Storage,
+};
 
 #[openbrush::trait_definition]
 pub trait FarmingGetters: Storage<Data> {

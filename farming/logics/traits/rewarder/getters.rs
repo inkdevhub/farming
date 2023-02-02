@@ -1,6 +1,6 @@
 use crate::traits::rewarder::rewarder::Data;
-use ink_env::AccountId;
 use openbrush::traits::{
+    AccountId,
     Balance,
     Storage,
 };

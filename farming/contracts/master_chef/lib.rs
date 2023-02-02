@@ -11,11 +11,10 @@ pub mod master_chef_contract {
             getters::*,
         },
     };
-    use ink_lang::codegen::{
+    use ink::codegen::{
         EmitEvent,
         Env,
     };
-    use ink_storage::traits::SpreadAllocate;
     use openbrush::{
         contracts::{
             ownable,
@@ -103,7 +102,7 @@ pub mod master_chef_contract {
     }
 
     #[ink(storage)]
-    #[derive(Default, SpreadAllocate, Storage)]
+    #[derive(Default, Storage)]
     pub struct FarmingContract {
         #[storage_field]
         farming: Data,
@@ -231,12 +230,12 @@ pub mod master_chef_contract {
     impl FarmingContract {
         #[ink(constructor)]
         pub fn new(arsw_token: AccountId) -> Self {
-            ink_lang::codegen::initialize_contract(|instance: &mut Self| {
-                let caller = instance.env().caller();
-                instance._init_with_owner(caller);
-                instance.farming.arsw_token = arsw_token;
-                instance.farming.farming_origin_block = Self::env().block_number();
-            })
+            let mut instance = Self::default();
+            let caller = instance.env().caller();
+            instance._init_with_owner(caller);
+            instance.farming.arsw_token = arsw_token;
+            instance.farming.farming_origin_block = Self::env().block_number();
+            instance
         }
     }
 }

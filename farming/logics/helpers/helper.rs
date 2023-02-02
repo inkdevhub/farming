@@ -1,5 +1,7 @@
-use ink_env::CallFlags;
-use ink_prelude::vec::Vec;
+use ink::{
+    env::CallFlags,
+    prelude::vec::Vec,
+};
 use openbrush::{
     contracts::psp22::{
         PSP22Error,
@@ -8,6 +10,7 @@ use openbrush::{
     traits::{
         AccountId,
         Balance,
+        String,
     },
 };
 
@@ -27,8 +30,11 @@ pub fn transfer_from_with_reentrancy(
     to: AccountId,
     value: Balance,
 ) -> Result<(), PSP22Error> {
-    PSP22Ref::transfer_from_builder(&token, from, to, value, Vec::new())
+    match PSP22Ref::transfer_from_builder(&token, from, to, value, Vec::new())
         .call_flags(CallFlags::default().set_allow_reentry(true))
         .fire()
-        .unwrap()
+    {
+        Ok(Ok(res)) => res,
+        _ => Err(PSP22Error::Custom(String::from("Transfer failed"))),
+    }
 }

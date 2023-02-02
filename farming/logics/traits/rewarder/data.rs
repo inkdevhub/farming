@@ -1,5 +1,7 @@
-use ink_env::AccountId;
-use openbrush::traits::Balance;
+use openbrush::traits::{
+    AccountId,
+    Balance,
+};
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
 
