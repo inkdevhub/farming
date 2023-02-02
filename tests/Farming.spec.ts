@@ -6,7 +6,12 @@ import Farming from '../types/contracts/master_chef_mock';
 import Rewarder from '../types/contracts/rewarder_contract';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { changeTokenBalances, emit, parseUnits, revertedWith } from './testHelpers';
+import {
+  changeTokenBalances,
+  emit,
+  parseUnits,
+  revertedWith,
+} from './testHelpers';
 import { expect } from '@jest/globals';
 import { scaleWeightV2 } from './utils';
 
@@ -58,7 +63,9 @@ describe('Farming', () => {
       farming.address,
     );
     rewarder = new Rewarder(rewarderAddress, deployer, api);
-    ({ value: originBlock } = await farming.query.getFarmingOriginBlock());
+    ({
+      value: { ok: originBlock },
+    } = await farming.query.getFarmingOriginBlock());
     let { gasRequired } = await aplo.query.mint(
       farming.address,
       parseUnits(1_000_000_000).toString(),
@@ -80,7 +87,9 @@ describe('Farming', () => {
       await setup();
       const firstBlockOfPeriodOne = getFirstBlock(1);
       const {
-        value: { ok: period },
+        value: {
+          ok: { ok: period },
+        },
       } = await farming.query.getPeriod(firstBlockOfPeriodOne);
       expect(period).toBe(1);
     });
@@ -90,7 +99,9 @@ describe('Farming', () => {
         (getFirstBlock(1) + getFirstBlock(2)) / 2,
       );
       const {
-        value: { ok: period },
+        value: {
+          ok: { ok: period },
+        },
       } = await farming.query.getPeriod(blockPeriodOne);
       expect(period).toBe(1);
     });
@@ -98,7 +109,9 @@ describe('Farming', () => {
     it('successfully get end block of Period-0', async () => {
       const endBlockOfPeriodZero = getFirstBlock(1) - 1;
       const {
-        value: { ok: period },
+        value: {
+          ok: { ok: period },
+        },
       } = await farming.query.getPeriod(endBlockOfPeriodZero);
       expect(period).toBe(0);
     });
@@ -116,7 +129,9 @@ describe('Farming', () => {
     it('successfully get max block of Period-0', async () => {
       const expectedBlock = getFirstBlock(1) - 1;
       const {
-        value: { ok: maxBlock },
+        value: {
+          ok: { ok: maxBlock },
+        },
       } = await farming.query.periodMax(0);
       expect(maxBlock).toBe(expectedBlock);
     });
@@ -124,7 +139,9 @@ describe('Farming', () => {
     it('successfully get max block of Period-1', async () => {
       const expectedBlock = getFirstBlock(2) - 1;
       const {
-        value: { ok: maxBlock },
+        value: {
+          ok: { ok: maxBlock },
+        },
       } = await farming.query.periodMax(1);
       expect(maxBlock).toBe(expectedBlock);
     });
@@ -135,7 +152,9 @@ describe('Farming', () => {
       'Return correct amount of period-%s',
       async (period: number) => {
         const {
-          value: { ok },
+          value: {
+            ok: { ok },
+          },
         } = await farming.query.arswPerBlock(period);
         expect(ok.toHuman()).toBe(getExpectedArswPerBlock(period));
       },
@@ -162,14 +181,16 @@ describe('Farming', () => {
       const result = await farming.tx.add(10, dummy.address, null, {
         gasLimit: scaleWeightV2(api, gasRequired, 2),
       });
-      const { lastRewardBlock, accArswPerShare } = (
-        await farming.query.getPoolInfo(0)
-      ).value;
+      const {
+        ok: { lastRewardBlock, accArswPerShare },
+      } = (await farming.query.getPoolInfo(0)).value;
       emit(result, 'LogUpdatePool', {
         poolId: 0,
         lastRewardBlock,
-        lpSupply: (await lp.query.balanceOf(farming.address)).value.toNumber(),
-        accArswPerShare: accArswPerShare.toNumber(),
+        lpSupply: (
+          await lp.query.balanceOf(farming.address)
+        ).value.ok.toNumber(),
+        accArswPerShare: accArswPerShare,
       });
     });
 
@@ -189,14 +210,16 @@ describe('Farming', () => {
       const { gasRequired } = await farming.query.updatePool(0);
       await advanceBlock();
       emit(
-        await farming.tx.updatePool(0, { gasLimit: scaleWeightV2(api, gasRequired, 2) }),
+        await farming.tx.updatePool(0, {
+          gasLimit: scaleWeightV2(api, gasRequired, 2),
+        }),
         'LogUpdatePool',
         {
           poolId: 0,
-          lastRewardBlock: (await farming.query.getBlockNumber()).value,
+          lastRewardBlock: (await farming.query.getBlockNumber()).value.ok,
           lpSupply: (
             await lp.query.balanceOf(farming.address)
-          ).value.toNumber(),
+          ).value.ok.toNumber(),
           accArswPerShare: 0,
         },
       );
@@ -212,7 +235,7 @@ describe('Farming', () => {
         false,
       );
       let result = await farming.tx.set(0, 10, dummy.address, false, {
-        gasLimit: scaleWeightV2(api, gasRequired, 2),
+        gasLimit: gasRequired,
       });
       emit(result, 'LogSetPool', {
         poolId: 0,
@@ -222,7 +245,7 @@ describe('Farming', () => {
       });
       ({ gasRequired } = await farming.query.set(0, 10, dummy.address, true));
       result = await farming.tx.set(0, 10, dummy.address, true, {
-        gasLimit: scaleWeightV2(api, gasRequired, 2),
+        gasLimit: gasRequired,
       });
       emit(result, 'LogSetPool', {
         poolId: 0,
@@ -243,16 +266,18 @@ describe('Farming', () => {
       const { gasRequired } = await farming.query.set(0, 1, null, true);
       await advanceBlock();
       const result = await farming.tx.set(0, 1, null, true, {
-        gasLimit: scaleWeightV2(api, gasRequired, 3),
+        gasLimit: scaleWeightV2(api, gasRequired, 2),
       });
-      const { lastRewardBlock, accArswPerShare } = (
-        await farming.query.getPoolInfo(0)
-      ).value;
+      const {
+        ok: { lastRewardBlock, accArswPerShare },
+      } = (await farming.query.getPoolInfo(0)).value;
       emit(result, 'LogUpdatePool', {
         poolId: 0,
         lastRewardBlock,
-        lpSupply: (await lp.query.balanceOf(farming.address)).value.toNumber(),
-        accArswPerShare: accArswPerShare.toNumber(),
+        lpSupply: (
+          await lp.query.balanceOf(farming.address)
+        ).value.ok.toNumber(),
+        accArswPerShare: accArswPerShare,
       });
       emit(
         result,
@@ -262,8 +287,8 @@ describe('Farming', () => {
           lastRewardBlock,
           lpSupply: (
             await dummy.query.balanceOf(farming.address)
-          ).value.toNumber(),
-          accArswPerShare: accArswPerShare.toNumber(),
+          ).value.ok.toNumber(),
+          accArswPerShare: accArswPerShare,
         },
         1,
       );
@@ -272,7 +297,9 @@ describe('Farming', () => {
 
   describe('PoolLength', () => {
     it('PoolLength should execute', async () => {
-      const { value: poolLength } = await farming.query.poolLength();
+      const {
+        value: { ok: poolLength },
+      } = await farming.query.poolLength();
       expect(poolLength).toBe(2);
     });
   });
@@ -318,7 +345,7 @@ describe('Farming', () => {
       expect(
         (
           await farming.query.getUserInfo(0, bob.address)
-        ).value.amount.toString(),
+        ).value.ok.amount.toString(),
       ).toBe('10');
       emit(tx, 'Deposit', {
         poolId: 0,
@@ -358,7 +385,7 @@ describe('Farming', () => {
       expect(
         (
           await farming.query.getUserInfo(0, bob.address)
-        ).value.rewardDebt.toString(),
+        ).value.ok.rewardDebt.toString(),
       ).toBe('0');
       const tx = await changeTokenBalances(
         () =>
@@ -371,9 +398,11 @@ describe('Farming', () => {
       );
       // Update rewardDebt
       expect(
-        (
-          await farming.query.getUserInfo(0, bob.address)
-        ).value.rewardDebt.toBigInt(),
+        BigInt(
+          (
+            await farming.query.getUserInfo(0, bob.address)
+          ).value.ok.rewardDebt.toString(),
+        ),
       ).toBeGreaterThan(0n);
       emit(tx, 'Withdraw', {
         poolId: 0,
@@ -395,7 +424,9 @@ describe('Farming', () => {
     it('PendingARSW should equal ExpectedARSW', async () => {
       const expectedArsw = '13784532561047545454';
       const {
-        value: { ok: pendingArsw },
+        value: {
+          ok: { ok: pendingArsw },
+        },
       } = await farming.query.pendingArsw(0, bob.address);
       expect(pendingArsw.toString()).toBe(expectedArsw);
       prevPendingArswBob = expectedArsw;
@@ -417,16 +448,24 @@ describe('Farming', () => {
         gasLimit: gasRequired,
       });
 
-      const { lastRewardBlock } = (await farming.query.getPoolInfo(0)).value;
+      const {
+        ok: { lastRewardBlock },
+      } = (await farming.query.getPoolInfo(0)).value;
 
-      const { value: currentBlock } = await farming.query.getBlockNumber();
+      const {
+        value: { ok: currentBlock },
+      } = await farming.query.getBlockNumber();
       expect(currentBlock).toBe(lastRewardBlock);
 
       const {
-        value: { ok: pendingArswBob },
+        value: {
+          ok: { ok: pendingArswBob },
+        },
       } = await farming.query.pendingArsw(0, bob.address);
       const {
-        value: { ok: pendingArswAlice },
+        value: {
+          ok: { ok: pendingArswAlice },
+        },
       } = await farming.query.pendingArsw(0, deployer.address);
       expect(pendingArswBob.toString()).toBe(prevPendingArswBob);
       expect(pendingArswAlice.toString()).toBe('0');
@@ -434,11 +473,15 @@ describe('Farming', () => {
     it('When a period is passed from the lastRewardBlock', async () => {
       await advanceBlock();
       const {
-        value: { ok: pendingArswBob },
+        value: {
+          ok: { ok: pendingArswBob },
+        },
       } = await farming.query.pendingArsw(0, bob.address);
       expect(pendingArswBob.toString()).toBe(prevPendingArswBob);
       const {
-        value: { ok: pendingArswAlice },
+        value: {
+          ok: { ok: pendingArswAlice },
+        },
       } = await farming.query.pendingArsw(0, deployer.address);
       expect(pendingArswAlice.toBigInt()).toBeGreaterThan(0n);
     });
@@ -455,18 +498,25 @@ describe('Farming', () => {
       const { gasRequired } = await farming
         .withSigner(bob)
         .query.harvest(0, bob.address);
-      let { value: aploBalance } = await aplo.query.balanceOf(bob.address);
+      let {
+        value: { ok: aploBalance },
+      } = await aplo.query.balanceOf(bob.address);
       expect(aploBalance.toBigInt()).toBe(0n);
       await farming
         .withSigner(bob)
         .tx.harvest(0, bob.address, { gasLimit: gasRequired });
-      ({ value: aploBalance } = await aplo.query.balanceOf(bob.address));
+      ({
+        value: { ok: aploBalance },
+      } = await aplo.query.balanceOf(bob.address));
       expect(aploBalance.toString()).toBe(prevPendingArswBob);
     });
   });
 
   async function advanceBlock(): Promise<void> {
-    await farming.tx.increaseBlockNumber(1, { gasLimit: scaleWeightV2(api, api.consts.system.blockWeights['maxBlock'], 0.6) });
+    const { gasRequired } = await farming.query.increaseBlockNumber(1);
+    await farming.tx.increaseBlockNumber(1, {
+      gasLimit: gasRequired,
+    });
   }
   function getFirstBlock(period: number): number {
     return originBlock + BLOCK_PER_PERIOD * period;
