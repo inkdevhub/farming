@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky install",
-    "compile": "typechain-compiler --toolchain nightly-2022-10-10",
-    "compile:release": "typechain-compiler --toolchain nightly-2022-10-10 --release",
+    "compile": "typechain-compiler --toolchain nightly-2022-10-10 --release",
     "test": "yarn test:typechain",
     "test:single": "jest",
     "test:typechain": "jest --testPathPattern \".spec.ts$\" --runInBand",
