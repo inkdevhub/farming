@@ -32,7 +32,7 @@ pub fn transfer_from_with_reentrancy(
 ) -> Result<(), PSP22Error> {
     match PSP22Ref::transfer_from_builder(&token, from, to, value, Vec::new())
         .call_flags(CallFlags::default().set_allow_reentry(true))
-        .fire()
+        .try_invoke()
     {
         Ok(Ok(res)) => res,
         _ => Err(PSP22Error::Custom(String::from("Transfer failed"))),

@@ -1,3 +1,4 @@
+use default_deriver::DataDefault;
 #[cfg(feature = "std")]
 use ink::storage::traits::StorageLayout;
 use ink::{
@@ -30,8 +31,8 @@ pub struct UserInfo {
     pub reward_debt: i128,
 }
 
-#[derive(Default, Debug)]
 #[openbrush::upgradeable_storage(STORAGE_KEY)]
+#[derive(Debug, DataDefault)]
 pub struct Data {
     /// Address of ARSW contract.
     pub arsw_token: AccountId,
