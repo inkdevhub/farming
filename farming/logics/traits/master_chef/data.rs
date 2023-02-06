@@ -1,7 +1,9 @@
-use ink_prelude::vec::Vec;
-use ink_storage::{
-    traits::*,
-    Mapping,
+use default_deriver::DataDefault;
+#[cfg(feature = "std")]
+use ink::storage::traits::StorageLayout;
+use ink::{
+    prelude::vec::Vec,
+    storage::Mapping,
 };
 use openbrush::traits::{
     AccountId,
@@ -14,7 +16,7 @@ use scale::{
 
 pub const STORAGE_KEY: u32 = openbrush::storage_unique_key!(Data);
 
-#[derive(Encode, Decode, SpreadLayout, PackedLayout, SpreadAllocate, Default)]
+#[derive(Encode, Decode, Default)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo, StorageLayout))]
 pub struct Pool {
     pub acc_arsw_per_share: u128,
@@ -22,15 +24,15 @@ pub struct Pool {
     pub alloc_point: u32,
 }
 
-#[derive(Encode, Decode, SpreadLayout, PackedLayout, SpreadAllocate, Default)]
+#[derive(Encode, Decode, Default)]
 #[cfg_attr(feature = "std", derive(scale_info::TypeInfo, StorageLayout))]
 pub struct UserInfo {
     pub amount: Balance,
     pub reward_debt: i128,
 }
 
-#[derive(Default, Debug)]
 #[openbrush::upgradeable_storage(STORAGE_KEY)]
+#[derive(Debug, DataDefault)]
 pub struct Data {
     /// Address of ARSW contract.
     pub arsw_token: AccountId,

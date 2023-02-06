@@ -8,11 +8,10 @@ pub mod rewarder {
         getters::*,
         rewarder::*,
     };
-    use ink_storage::traits::SpreadAllocate;
     use openbrush::traits::Storage;
 
     #[ink(storage)]
-    #[derive(Default, SpreadAllocate, Storage)]
+    #[derive(Default, Storage)]
     pub struct Rewarderontract {
         #[storage_field]
         rewarder: Data,
@@ -29,14 +28,11 @@ pub mod rewarder {
             reward_token: AccountId,
             master_chef: AccountId,
         ) -> Self {
-            ink_lang::codegen::initialize_contract(|instance: &mut Self| {
-                instance.rewarder.reward_multiplier = reward_multiplier;
-                instance.rewarder.reward_token = reward_token;
-                instance.rewarder.master_chef = master_chef;
-            })
+            let mut instance = Self::default();
+            instance.rewarder.reward_multiplier = reward_multiplier;
+            instance.rewarder.reward_token = reward_token;
+            instance.rewarder.master_chef = master_chef;
+            instance
         }
-
-        #[ink(message)]
-        pub fn dummy(&self) {}
     }
 }

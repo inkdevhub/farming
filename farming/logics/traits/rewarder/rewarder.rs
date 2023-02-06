@@ -3,13 +3,13 @@ pub use crate::traits::rewarder::{
     errors::RewarderError,
     getters::RewarderGetters,
 };
-use ink_env::AccountId;
-use ink_prelude::vec::Vec;
+use ink::prelude::vec::Vec;
 use openbrush::{
     contracts::traits::psp22::PSP22Ref,
     modifier_definition,
     modifiers,
     traits::{
+        AccountId,
         Balance,
         Storage,
     },

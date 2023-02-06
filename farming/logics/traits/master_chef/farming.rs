@@ -23,8 +23,7 @@ use crate::{
         },
     },
 };
-use ink_env::CallFlags;
-use ink_prelude::vec::Vec;
+use ink::prelude::vec::Vec;
 use openbrush::{
     contracts::{
         ownable::*,
@@ -122,7 +121,7 @@ pub trait Farming:
                 Some(rewarder_address) => {
                     self.data::<Data>()
                         .rewarders
-                        .insert(&pool_id, &rewarder_address)
+                        .insert(&pool_id, &rewarder_address);
                 }
                 None => self.data::<Data>().rewarders.remove(&pool_id),
             }
@@ -420,16 +419,12 @@ pub trait Farming:
     fn deposit_arsw(&mut self, amount: Balance) -> Result<(), FarmingError> {
         ensure!(amount > 0, FarmingError::ZeroWithdrawal);
         let caller = Self::env().caller();
-        PSP22Ref::transfer_from_builder(
-            &mut self.data::<Data>().arsw_token,
+        transfer_from_with_reentrancy(
+            self.data::<Data>().arsw_token,
             caller,
             Self::env().account_id(),
             amount,
-            Vec::new(),
-        )
-        .call_flags(CallFlags::default().set_allow_reentry(true))
-        .fire()
-        .unwrap()?;
+        )?;
         self._emit_deposit_arsw_event(self.block_number(), amount);
         Ok(())
     }
