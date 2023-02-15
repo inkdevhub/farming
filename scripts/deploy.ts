@@ -68,6 +68,7 @@ async function main(): Promise<void> {
   await farming.tx.add(10, usdtSbyAddress, null, {
     gasLimit: gasRequired,
   });
+  await api.disconnect();
 }
 
 main().catch((error) => {
