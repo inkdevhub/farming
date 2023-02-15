@@ -10,6 +10,7 @@
     "test:typechain": "jest --testPathPattern \".spec.ts$\" --runInBand",
     "lint": "prettier --check . && eslint . && cargo check",
     "lint:fix": "prettier --write . && eslint . --fix && cargo fmt --all",
+    "deploy": "ts-node scripts/deploy.ts",
     "postinstall": "patch-package"
   },
   "devDependencies": {
