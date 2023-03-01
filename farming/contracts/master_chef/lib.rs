@@ -3,13 +3,10 @@
 
 #[openbrush::contract]
 pub mod master_chef_contract {
-    use farming::traits::{
-        block::BlockInfo,
-        master_chef::{
-            events::*,
-            farming::*,
-            getters::*,
-        },
+    use farming::traits::master_chef::{
+        events::*,
+        farming::*,
+        getters::*,
     };
     use ink::codegen::{
         EmitEvent,
@@ -111,12 +108,6 @@ pub mod master_chef_contract {
     }
 
     impl Farming for FarmingContract {}
-
-    impl BlockInfo for FarmingContract {
-        fn block_number(&self) -> BlockNumber {
-            self.env().block_number()
-        }
-    }
 
     impl FarmingGetters for FarmingContract {}
 

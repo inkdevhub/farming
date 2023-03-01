@@ -33,6 +33,7 @@ use openbrush::{
     traits::{
         AccountId,
         Balance,
+        BlockNumber,
         Storage,
     },
 };
@@ -589,5 +590,11 @@ pub trait Farming:
             .get_lp_token(pool_id)
             .ok_or(FarmingError::LpTokenNotFound)?;
         Ok(PSP22Ref::balance_of(&lp_token, Self::env().account_id()))
+    }
+}
+
+impl<T: Storage<Data>> BlockInfo for T {
+    default fn block_number(&self) -> BlockNumber {
+        Self::env().block_number()
     }
 }
